@@ -1,5 +1,6 @@
 package com.example.serviciosandroid;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -24,6 +26,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         btnCrear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                cargarInterfaz();
             }
         });
         cargaDatosEstudiantes();
@@ -63,6 +68,39 @@ public class MainActivity extends AppCompatActivity {
                         etDireccion.getText().toString(),etTelefono.getText().toString());
             }
         });
+        builder.show();
+    }
+
+    public void crearEstudiante(String cedula, String nombre, String apellido,
+                                String direccion, String telefono){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "http://192.168.0.10/soauta3/models/guardar.php";
+
+        StringRequest request = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        cargaDatosEstudiantes();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                    }
+                }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("EST_CEDULA", cedula);
+                params.put("EST_NOMBRE", nombre);
+                params.put("EST_APELLIDO", apellido);
+                params.put("EST_DIRECCION", direccion);
+                params.put("EST_TELEFONO", telefono);
+                return params;
+            }
+        };
+        queue.add(request);
     }
 
     private void cargaDatosEstudiantes(){
