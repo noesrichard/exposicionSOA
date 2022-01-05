@@ -1,10 +1,16 @@
 package com.example.serviciosandroid;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -23,13 +29,40 @@ public class MainActivity extends AppCompatActivity {
 
     RecyclerView rvEstudiantes;
     AdaptadorEstudiante adaptadorEstudiante;
+    Button btnCrear;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rvEstudiantes = (RecyclerView) findViewById(R.id.rvLista);
         rvEstudiantes.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        btnCrear = findViewById(R.id.btnCrear);
+        btnCrear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
         cargaDatosEstudiantes();
+    }
+
+    public void cargarInterfaz(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        View inflater = LayoutInflater.from(MainActivity.this).inflate(R.layout.crear_estudiante, null);
+        builder.setTitle("Crear Estudiante");
+        EditText etCedula = inflater.findViewById(R.id.etCedula);
+        EditText etNombre = inflater.findViewById(R.id.etNombre);
+        EditText etApellido = inflater.findViewById(R.id.etApellido);
+        EditText etDireccion = inflater.findViewById(R.id.etDireccion);
+        EditText etTelefono = inflater.findViewById(R.id.etTelefono);
+        builder.setView(inflater);
+        builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                crearEstudiante(etCedula.getText().toString(),
+                        etNombre.getText().toString(),etApellido.getText().toString(),
+                        etDireccion.getText().toString(),etTelefono.getText().toString());
+            }
+        });
     }
 
     private void cargaDatosEstudiantes(){
