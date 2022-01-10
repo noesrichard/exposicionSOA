@@ -100,13 +100,13 @@ public class AdaptadorEstudiante extends RecyclerView.Adapter<AdaptadorEstudiant
                 public void onClick(DialogInterface dialog, int which) {
                     editarEstudiante(etCedula.getText().toString(),
                             etNombre.getText().toString(),etApellido.getText().toString(),
-                            etDireccion.getText().toString(),etTelefono.getText().toString());
+                            etDireccion.getText().toString(),etTelefono.getText().toString(), e);
                 }
             });
             builder.show();
         }
         public void editarEstudiante(String cedula, String nombre, String apellido,
-                                    String direccion, String telefono){
+                                    String direccion, String telefono, Estudiante e){
             RequestQueue queue = Volley.newRequestQueue(contexto);
             String url = "http://192.168.0.10/soauta3/models/modificar.php";
 
@@ -114,6 +114,12 @@ public class AdaptadorEstudiante extends RecyclerView.Adapter<AdaptadorEstudiant
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
+                            e.setCedula(cedula);
+                            e.setApellido(apellido);
+                            e.setNombre(nombre);
+                            e.setDireccion(direccion);
+                            e.setTelefono(telefono);
+                            asignarDatos(e);
                         }
                     },
                     new Response.ErrorListener() {
