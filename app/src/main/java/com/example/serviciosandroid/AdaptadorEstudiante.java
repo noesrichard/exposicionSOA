@@ -45,6 +45,7 @@ public class AdaptadorEstudiante extends RecyclerView.Adapter<AdaptadorEstudiant
     public void onBindViewHolder(@NonNull AdaptadorEstudiante.ViewHolder holder, int position) {
         holder.asignarDatos(estudiantes.get(position));
         holder.accionEditarEstudiante(estudiantes.get(position));
+        holder.accionEliminarEstudiante(estudiantes.get(position), estudiantes);
     }
 
     @Override
@@ -55,9 +56,11 @@ public class AdaptadorEstudiante extends RecyclerView.Adapter<AdaptadorEstudiant
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvCedula, tvNombre, tvApellido, tvDireccion, tvTelefono;
         Context contexto;
-        Button btnEditar;
+        Button btnEditar, btnEliminar;
+        View itemView;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            this.itemView = itemView;
             contexto = itemView.getContext();
             tvCedula = (TextView) itemView.findViewById(R.id.tvCedula);
             tvNombre = (TextView) itemView.findViewById(R.id.tvNombre);
@@ -65,6 +68,30 @@ public class AdaptadorEstudiante extends RecyclerView.Adapter<AdaptadorEstudiant
             tvDireccion = (TextView) itemView.findViewById(R.id.tvDireccion);
             tvTelefono = (TextView) itemView.findViewById(R.id.tvTelefono);
             btnEditar = (Button) itemView.findViewById(R.id.btnEditar);
+            btnEliminar = (Button) itemView.findViewById(R.id.btnEliminar);
+        }
+
+        public void accionEliminarEstudiante(Estudiante e, ArrayList<Estudiante> estudiantes){
+            btnEliminar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
+                    builder.setTitle("Eliminar Estudiante");
+                    builder.setMessage("Esta seguro que desea eliminar al estudiante con cedula: "+e.getCedula()+"?");
+                    builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            eliminarEstudiante(e, estudiantes);
+                        }
+                    });
+                    builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                    builder.show();
+                }
+            });
         }
 
         public void accionEditarEstudiante(Estudiante e){
@@ -105,18 +132,43 @@ public class AdaptadorEstudiante extends RecyclerView.Adapter<AdaptadorEstudiant
             });
             builder.show();
         }
-        public void editarEstudiante(String cedula, String nombre, String apellido,
-                                    String direccion, String telefono, Estudiante e){
+        public void eliminarEstudiante(Estudiante e, ArrayList<Estudiante> estudiantes){
             RequestQueue queue = Volley.newRequestQueue(contexto);
-            String url = "http://192.168.0.10/soauta3/models/modificar.php";
-
+            String url = "http://192.168.0.10/soauta3/models/eliminar.php";
             StringRequest request = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            e.setCedula(cedula);
-                            e.setApellido(apellido);
-                            e.setNombre(nombre);
+                            estudiantes.remove(e);
+                            notifyDataSetChanged();
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                        }
+                    }){
+                @Nullable
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("EST_CEDULA", e.getCedula());
+                    return params;
+                }
+            };
+            queue.add(request);
+        }
+
+
+        public void editarEstudiante(String cedula, String nombre, String apellido,
+                                    String direccion, String telefono, Estudiante e){
+            RequestQueue queue = Volley.newRequestQueue(contexto);
+            String url = "http://192.168.0.10/soauta3/models/modificar.php";
+            StringRequest request = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            e.setCedula(cedula); e.setApellido(apellido); e.setNombre(nombre);
                             e.setDireccion(direccion);
                             e.setTelefono(telefono);
                             asignarDatos(e);

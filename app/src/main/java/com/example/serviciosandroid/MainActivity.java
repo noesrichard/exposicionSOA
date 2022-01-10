@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     RecyclerView rvEstudiantes;
     AdaptadorEstudiante adaptadorEstudiante;
-    Button btnCrear;
+    Button btnCrear, btnRecargar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +45,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 cargarInterfaz();
+            }
+        });
+        btnRecargar = findViewById(R.id.btnRecargar);
+        btnRecargar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cargaDatosEstudiantes();
             }
         });
         cargaDatosEstudiantes();
@@ -103,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         queue.add(request);
     }
 
-    private void cargaDatosEstudiantes(){
+    public void cargaDatosEstudiantes(){
 
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = "http://192.168.0.10/soauta3/models/acceder.php";
