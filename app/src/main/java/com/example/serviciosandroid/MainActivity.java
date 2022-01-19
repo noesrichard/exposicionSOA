@@ -1,15 +1,21 @@
 package com.example.serviciosandroid;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,13 +39,17 @@ public class MainActivity extends AppCompatActivity {
 
     RecyclerView rvEstudiantes;
     AdaptadorEstudiante adaptadorEstudiante;
-    Button btnCrear, btnRecargar;
+    Button btnCrear, btnRecargar, btnBuscar;
+    SharedPreferences preferences;
+    EditText etBuscar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        preferences = getSharedPreferences("com.example.serviciosandroid", Context.MODE_PRIVATE);
         rvEstudiantes = (RecyclerView) findViewById(R.id.rvLista);
         rvEstudiantes.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        etBuscar = findViewById(R.id.etCedulaBuscar);
         btnCrear = findViewById(R.id.btnCrear);
         btnCrear.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,14 +57,69 @@ public class MainActivity extends AppCompatActivity {
                 cargarInterfaz();
             }
         });
-        btnRecargar = findViewById(R.id.btnRecargar);
+        btnRecargar = findViewById(R.id.btnSalir);
         btnRecargar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cargaDatosEstudiantes();
+                preferences.edit().remove("session").commit();
+                finish();
+                System.exit(0);
+            }
+        });
+        etBuscar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                buscarEstudiante(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
             }
         });
         cargaDatosEstudiantes();
+    }
+    public void buscarEstudiante(String cedula){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "http://192.168.0.10/soauta3/models/buscar_estudiante.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        if(response.equals("false")) {
+                            rvEstudiantes.setAlpha(0);
+                        } else {
+                            try {
+                                rvEstudiantes.setAlpha(1);
+                                JSONArray jsonArray = new JSONArray(response);
+                                ArrayList<Estudiante> estudiantes = Estudiante.getEstudiantesFromJson(jsonArray);
+                                adaptadorEstudiante = new AdaptadorEstudiante(estudiantes);
+                                rvEstudiantes.setAdapter(adaptadorEstudiante);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                    }
+                }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("cedula", cedula);
+                return params;
+            }
+        };
+
+        queue.add(stringRequest);
     }
 
     public void cargarInterfaz(){

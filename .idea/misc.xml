@@ -3,9 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/carri/AndroidStudioProjects/serviciosAndroid/app/src/main/res/layout/activity_inicio.xml" value="0.25" />
         <entry key="..\:/Users/carri/AndroidStudioProjects/serviciosAndroid/app/src/main/res/layout/activity_main.xml" value="0.2546875" />
         <entry key="..\:/Users/carri/AndroidStudioProjects/serviciosAndroid/app/src/main/res/layout/carta_estudiante.xml" value="0.25" />
         <entry key="..\:/Users/carri/AndroidStudioProjects/serviciosAndroid/app/src/main/res/layout/crear_estudiante.xml" value="0.33" />
+        <entry key="..\:/Users/carri/AndroidStudioProjects/serviciosAndroid/app/src/main/res/layout/iniciar_sesion.xml" value="0.20364583333333333" />
+        <entry key="..\:/Users/carri/AndroidStudioProjects/serviciosAndroid/app/src/main/res/layout/inicio.xml" value="0.26875" />
       </map>
     </option>
   </component>

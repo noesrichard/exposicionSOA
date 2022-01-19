@@ -34,6 +34,7 @@ public class AdaptadorEstudiante extends RecyclerView.Adapter<AdaptadorEstudiant
         this.estudiantes = estudiantes;
     }
 
+
     @NonNull
     @Override
     public AdaptadorEstudiante.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
